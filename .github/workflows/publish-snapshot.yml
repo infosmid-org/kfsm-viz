@@ -27,6 +27,6 @@ jobs:
         uses: gradle/actions/setup-gradle@v6
 
       - name: Build, test and publish to GitHub Packages
-        run: ./gradlew build publishToMavenLocal
+        run: ./gradlew build publishToMavenLocal publishMavenPublicationToGitHubPackagesRepository
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
