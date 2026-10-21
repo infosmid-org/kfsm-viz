@@ -1,0 +1,26 @@
+{
+  "mcpServers": {
+    "idea": {
+      "url": "http://127.0.0.1:64342/stream",
+      "type": "http"
+    },
+    "codegraphcontext": {
+      "command": "codegraphcontext",
+      "args": [
+        "mcp",
+        "start"
+      ]
+    },
+    "perplexity": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@perplexity-ai/mcp-server"
+      ],
+      "env": {
+        "PERPLEXITY_API_KEY": "${PERPLEXITY_API_KEY}"
+      }
+    }
+  }
+}

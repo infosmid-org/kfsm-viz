@@ -136,7 +136,7 @@ addChecksum(CharacterConstants.ESC)
 a| [source,kotlin]
 ----
 {byte->
-require(byte != null)
+kotlin.require(byte != null)
 addChecksum(byte)
 }
 ----

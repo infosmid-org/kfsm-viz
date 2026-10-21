@@ -1,0 +1,19 @@
+[versions]
+kotlin = "2.2.21"
+dokka = "2.2.0"
+antlr = "4.13.2"
+junit = "4.13.2"
+kfsm = "1.9.0-RC1"
+maven-publish-plugin = "0.37.0"
+
+[libraries]
+kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
+antlr-tool = { module = "org.antlr:antlr4", version.ref = "antlr" }
+antlr-runtime = { module = "org.antlr:antlr4-runtime", version.ref = "antlr" }
+junit = { module = "junit:junit", version.ref = "junit" }
+kfsm-jvm = { module = "io.jumpco.open:kfsm-jvm", version.ref = "kfsm" }
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish-plugin" }

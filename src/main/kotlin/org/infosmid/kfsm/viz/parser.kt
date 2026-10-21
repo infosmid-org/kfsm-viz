@@ -1,23 +1,34 @@
 /*
- * Copyright (c) 2020-2021. Open JumpCO
+ * Copyright 2026 the original author or authors.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and limitations under the License.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-package io.jumpco.open.kfsm.viz
+package org.infosmid.kfsm.viz
 
-import io.jumpco.open.kfsm.viz.TransitionType.*
-import org.jetbrains.kotlin.spec.grammar.tools.KotlinParseTree
-import org.jetbrains.kotlin.spec.grammar.tools.KotlinParseTreeNodeType
-import org.jetbrains.kotlin.spec.grammar.tools.parseKotlinCode
-import org.jetbrains.kotlin.spec.grammar.tools.tokenizeKotlinCode
+import org.infosmid.kfsm.viz.TransitionType.*
+import org.infosmid.kfsm.viz.grammar.KotlinLexer
+import org.infosmid.kfsm.viz.grammar.KotlinParser
+import org.antlr.v4.runtime.BaseErrorListener
+import org.antlr.v4.runtime.CharStreams
+import org.antlr.v4.runtime.CommonTokenStream
+import org.antlr.v4.runtime.RecognitionException
+import org.antlr.v4.runtime.Recognizer
+import org.antlr.v4.runtime.Token
+import org.antlr.v4.runtime.tree.ParseTree
+import org.antlr.v4.runtime.tree.TerminalNode
 import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
-import kotlin.math.exp
 
 /**
  * @author Corneil du Plessis
@@ -97,6 +108,68 @@ class VisualStateMapDefinition(val name: String) {
     }
 }
 
+internal enum class KotlinParseTreeNodeType { RULE, TERMINAL }
+
+/**
+ * Simplified view of the ANTLR parse tree. Rule nodes are named after the grammar rule and have no text.
+ * Terminal nodes are named after the token type and have the token text.
+ */
+internal class KotlinParseTree(
+    val name: String,
+    val type: KotlinParseTreeNodeType,
+    val text: String?,
+    val children: List<KotlinParseTree>
+) {
+    override fun toString(): String = "$name${if (text != null) "=$text" else ""}"
+}
+
+internal class KotlinSyntaxException(message: String) : RuntimeException(message)
+
+internal fun parseKotlinCode(code: String): KotlinParseTree {
+    val errors = mutableListOf<String>()
+    val listener = object : BaseErrorListener() {
+        override fun syntaxError(
+            recognizer: Recognizer<*, *>?,
+            offendingSymbol: Any?,
+            line: Int,
+            charPositionInLine: Int,
+            msg: String?,
+            e: RecognitionException?
+        ) {
+            errors += "$line:$charPositionInLine $msg"
+        }
+    }
+    val lexer = KotlinLexer(CharStreams.fromString(code))
+    lexer.removeErrorListeners()
+    lexer.addErrorListener(listener)
+    val parser = KotlinParser(CommonTokenStream(lexer))
+    parser.removeErrorListeners()
+    parser.addErrorListener(listener)
+    val tree = parser.kotlinFile()
+    if (errors.isNotEmpty()) {
+        throw KotlinSyntaxException("Syntax errors: ${errors.take(10).joinToString("; ")}")
+    }
+    return convert(tree, parser)
+}
+
+private fun convert(tree: ParseTree, parser: KotlinParser): KotlinParseTree =
+    when (tree) {
+        is TerminalNode -> {
+            val tokenType = tree.symbol.type
+            val name = if (tokenType == Token.EOF) "EOF" else parser.vocabulary.getSymbolicName(tokenType) ?: "T$tokenType"
+            KotlinParseTree(name, KotlinParseTreeNodeType.TERMINAL, tree.text, emptyList())
+        }
+        else -> {
+            val ruleIndex = (tree as org.antlr.v4.runtime.ParserRuleContext).ruleIndex
+            KotlinParseTree(
+                parser.ruleNames[ruleIndex],
+                KotlinParseTreeNodeType.RULE,
+                null,
+                (0 until tree.childCount).map { convert(tree.getChild(it), parser) }
+            )
+        }
+    }
+
 object Parser {
     private fun printTreeDepth(parseTree: KotlinParseTree, writer: PrintWriter, depth: Int = 0) {
         repeat(depth) { writer.print("  ") }
@@ -151,8 +224,7 @@ object Parser {
 
     @JvmStatic
     fun parseStateMachine(parentClass: String, sourceFile: File): VisualStateMachineDefinion {
-        val tokens = tokenizeKotlinCode(sourceFile.readText())
-        val parseTree = parseKotlinCode(tokens)
+        val parseTree = parseKotlinCode(sourceFile.readText())
         val classNode = findClass(parentClass, parseTree)
         // TODO search for whenState and find parent function
         val stateMachine = findExpressionWithIdentifier(stateMachineCreatorMethodNames, classNode).first()
@@ -193,7 +265,7 @@ object Parser {
                 val values = findNodeWithText(
                     KotlinParseTreeNodeType.TERMINAL,
                     "Identifier",
-                    child!!
+                    child
                 ).filter { it.text != "defaultInitialState" }.toList()
                 if (values.isNotEmpty()) {
                     val expr = stripQuotes(printTree(values.last()))
@@ -212,7 +284,7 @@ object Parser {
                 }
             }
             if (defaultStartState.isNotEmpty()) {
-                val startStateName = defaultStartState.first()!!
+                val startStateName = defaultStartState.first()
                 val stateMachineDefinition = result.stateMaps[result.name]!!
                 if (stateMachineDefinition.states.contains(startStateName)) {
                     stateMachineDefinition.transitions.add(VisualTransition("<<start>>", null, startStateName))
@@ -247,7 +319,7 @@ object Parser {
                     }
                 }
                 if (startState.isNotEmpty()) {
-                    val startStateName = startState.first()!!
+                    val startStateName = startState.first()
                     val stateMachineDefinition = result.stateMaps[result.name]!!
                     if (stateMachineDefinition.states.contains(startStateName)) {
                         stateMachineDefinition.transitions.add(VisualTransition("<<start>>", null, startStateName))

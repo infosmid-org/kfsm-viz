@@ -21,6 +21,6 @@ RCVCHK --> CHKSUM : CTRL [it == CharacterConstants.EOT] -> {\l  checksum()\l}
 CHKSUM --> [*] : <<automatic>> [!checksumValid] -> {\l  sendNACK()\l}
 CHKSUM --> [*] : <<automatic>> [checksumValid] -> {\l  sendACK()\l}
 RCVCHKESC --> RCVCHK : ESC -> {\l  addChecksum(CharacterConstants.ESC)\l}
-RCVCHKESC --> RCVCHK : CTRL -> {byte->\l  require(byte != null)\l  addChecksum(byte)\l}
+RCVCHKESC --> RCVCHK : CTRL -> {byte->\l  kotlin.require(byte != null)\l  addChecksum(byte)\l}
 }
 @enduml

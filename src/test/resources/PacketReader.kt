@@ -1,19 +1,33 @@
 /*
- * Copyright (c) 2020-2021. Open JumpCO
+ * Copyright 2026 the original author or authors.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
- * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and limitations under the License.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 import ReaderEvents.*
 import ReaderStates.*
-import io.jumpco.open.kfsm.stateMachine
+import org.infosmid.kfsm.stateMachine
 import java.io.ByteArrayOutputStream
+import kotlin.collections.forEach
+import kotlin.collections.forEachIndexed
+import kotlin.collections.mapIndexed
+import kotlin.collections.reduce
+import kotlin.collections.toSet
+import kotlin.text.padStart
+import kotlin.text.toString
+import kotlin.to
 
 class Block {
-    val byteArrayOutputStream = ByteArrayOutputStream(32)
+    val byteArrayOutputStream = java.io.ByteArrayOutputStream(32)
     fun addByte(byte: Int) {
         byteArrayOutputStream.write(byte)
     }
@@ -36,17 +50,17 @@ interface PacketHandler : ProtocolHandler {
 
 class ProtocolSender : ProtocolHandler {
     override fun sendNACK() {
-        println("NACK")
+        kotlin.io.println("NACK")
     }
 
     override fun sendACK() {
-        println("ACK")
+        kotlin.io.println("ACK")
     }
 }
 
 class Packet(private val protocolHandler: ProtocolHandler) : PacketHandler,
     ProtocolHandler by protocolHandler {
-    val fields = mutableListOf<ByteArray>()
+    val fields = kotlin.collections.mutableListOf<ByteArray>()
     private var currentField: Block? = null
     private var _checksumValid: Boolean = false
 
@@ -55,16 +69,16 @@ class Packet(private val protocolHandler: ProtocolHandler) : PacketHandler,
     private val checkSum = Block()
 
     override fun print() {
-        println("Checksum:$checksumValid:Fields:${fields.size}")
+        kotlin.io.println("Checksum:$checksumValid:Fields:${fields.size}")
         fields.forEachIndexed { index, bytes ->
-            print("FLD:$index:")
+            kotlin.io.print("FLD:$index:")
             bytes.forEach { byte ->
                 val hex = byte.toString(16).padStart(2, '0')
-                print(" $hex")
+                kotlin.io.print(" $hex")
             }
-            println()
+            kotlin.io.println()
         }
-        println()
+        kotlin.io.println()
     }
 
     override fun addField() {
@@ -73,25 +87,25 @@ class Packet(private val protocolHandler: ProtocolHandler) : PacketHandler,
 
     override fun endField() {
         val field = currentField
-        require(field != null) { "expected currentField to have a value" }
+        kotlin.require(field != null) { "expected currentField to have a value" }
         fields.add(field.byteArrayOutputStream.toByteArray())
         currentField = null
     }
 
     override fun addByte(byte: Int?) {
-        require(byte != null) { "argument required" }
+        kotlin.require(byte != null) { "argument required" }
         val field = currentField
-        require(field != null) { "expected currentField to have a value" }
+        kotlin.require(field != null) { "expected currentField to have a value" }
         field.addByte(byte)
     }
 
     override fun addChecksum(byte: Int?) {
-        require(byte != null) { "argument required" }
+        kotlin.require(byte != null) { "argument required" }
         checkSum.addByte(byte)
     }
 
     override fun checksum() {
-        require(checkSum.byteArrayOutputStream.size() > 0)
+        kotlin.require(checkSum.byteArrayOutputStream.size() > 0)
         val checksumBytes = checkSum.byteArrayOutputStream.toByteArray()
         _checksumValid = if (checksumBytes.size == fields.size) {
             checksumBytes.mapIndexed { index, cs ->
@@ -139,7 +153,7 @@ enum class ReaderStates {
 class PacketReaderFSM(private val packetHandler: PacketHandler) {
     companion object {
         // tag::definition[]
-        val definition = stateMachine(
+        val definition = org.infosmid.kfsm.stateMachine(
             ReaderStates.values().toSet(),
             ReaderEvents.values().toSet(),
             PacketHandler::class,
@@ -207,7 +221,7 @@ class PacketReaderFSM(private val packetHandler: PacketHandler) {
                     addChecksum(CharacterConstants.ESC)
                 }
                 onEvent(CTRL to RCVCHK) { byte ->
-                    require(byte != null)
+                    kotlin.require(byte != null)
                     addChecksum(byte)
                 }
             }
@@ -218,7 +232,7 @@ class PacketReaderFSM(private val packetHandler: PacketHandler) {
     private val fsm = definition.create(packetHandler)
     fun receiveByte(byte: Int) {
         when (byte) {
-            CharacterConstants.ESC -> fsm.sendEvent(ReaderEvents.ESC, CharacterConstants.ESC)
+            CharacterConstants.ESC -> fsm.sendEvent(ESC, CharacterConstants.ESC)
             CharacterConstants.SOH,
             CharacterConstants.EOT,
             CharacterConstants.ETX,

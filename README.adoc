@@ -4,10 +4,9 @@ This work is licensed under link:https://www.apache.org/licenses/LICENSE-2.0.htm
 
 This project will explore many ways to visualize KFSM definitions.
 
-This project require Kotlin Grammar Tools in order to parse the code containing the FSM.
-
-I made changes to `https://github.com/Kotlin/grammar-tools` if the change had been merge the batch file change change to checkout
-their version.
+The Kotlin source containing the FSM is parsed with an ANTLR parser generated at build time from the Kotlin grammar
+(`src/main/antlr`, taken from the `develop` branch of https://github.com/Kotlin/kotlin-spec[kotlin-spec], see `KOTLIN_SPEC_COMMIT`).
+No external grammar tools need to be built or installed. Run `./download-kotlin-spec-tools.sh` to update the grammar from kotlin-spec `develop` and rebuild.
 
 == Getting Started
 
@@ -20,11 +19,11 @@ repositories {
     mavenCentral()
 }
 dependencies {
-    testImplementation 'io.jumpco.open:kfsm-viz:1.5.2.4'
+    testImplementation 'org.infosmid:kfsm-viz:2.0.0'
 }
 -----
 
-You can implement a test method to generate the required statemachine model artifacts, or you can configure the link:https://github.com/open-jumpco/kfsm-viz-plugin[kfsm-viz-plugin] for Gradle to produce visualizations.
+You can implement a test method to generate the required statemachine model artifacts, or you can configure the link:https://github.com/infosmid-org/kfsm-viz-plugin[kfsm-viz-plugin] for Gradle to produce visualizations.
 
 === PlantUML Statemachine Diagram
 
@@ -67,7 +66,7 @@ We generated an asciidoc table as well as a plantuml statemachine model.
 
 ==== Simple Turnstile FSM
 
-link:./src/test/kotlin/SimpleTurnstile.kt[SimpleTurnstile.kt]
+link:./src/test/resources/SimpleTurnstile.kt[SimpleTurnstile.kt]
 
 ===== Simple State Diagram
 
@@ -81,7 +80,7 @@ include::generated-parsed/simple-turnstile.adoc[]
 
 ==== Paying Turnstile FSM
 
-link:./src/test/kotlin/PayingTurnstile.kt[PayingTurnstile.kt]
+link:./src/test/resources/PayingTurnstile.kt[PayingTurnstile.kt]
 
 ===== Simple State Diagram
 
@@ -95,7 +94,7 @@ include::generated-parsed/paying-turnstile.adoc[]
 
 ==== Secure Turnstile FSM
 
-link:./src/test/kotlin/SecureTurnstile.kt[SecureTurnstile.kt]
+link:./src/test/resources/SecureTurnstile.kt[SecureTurnstile.kt]
 
 ===== Simple State Diagram
 
@@ -109,7 +108,7 @@ include::generated-parsed/secure-turnstile.adoc[]
 
 ==== Packer Reader FSM
 
-link:./src/test/kotlin/PacketReader.kt[PacketReader.kt]
+link:./src/test/resources/PacketReader.kt[PacketReader.kt]
 
 ===== Simple State Diagram
 

@@ -2,3 +2,7 @@ build/
 .idea/
 .gradle/
 out/
+spec-tools/
+kfsm-viz parser prototypes/
+/kfsm-viz parser prototypes.zip
+/lib/
