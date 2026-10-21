@@ -1,0 +1,20 @@
+---
+title: PayingTurnstileFSM
+config:
+  themeCSS: |
+    .edgeLabel p:has(br) { text-align: left; }
+---
+stateDiagram-v2
+state PayingTurnstileFSM {
+  [*] --> UNLOCKED
+  LOCKED --> COINS : COIN
+  LOCKED --> COINS : COIN
+  UNLOCKED --> UNLOCKED : COIN
+  UNLOCKED --> LOCKED : PASS
+  state coins {
+    COINS --> UNLOCKED : #60;#60;automatic#62;#62;
+    COINS --> UNLOCKED : #60;#60;automatic#62;#62;
+    COINS --> COINS : COIN
+  }
+}
+

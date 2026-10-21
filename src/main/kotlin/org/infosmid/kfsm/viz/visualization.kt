@@ -26,6 +26,113 @@ import java.io.StringWriter
  * @soundtrack Wolfgang Amadeus Mozart
  */
 object Visualization {
+    fun String.mermaidEscape() = this
+        .replace(";", "#59;")
+        .replace("#", "#35;")
+        .replace(Regex("""\s+->\s+"""), "#160;#8594;#160;")
+        .replace("->", "#8594;")
+        .replace(":", "#58;")
+//        .replace("[", "#91;").replace("]", "#93;")
+        .replace("{", "#123;").replace("}", "#125;")
+        .replace("<", "#60;").replace(">", "#62;")
+        .replace("&", "#38;")
+        .replace("\r\n", "\n").replace("\n", "<br/>")
+        .replace(" ", "#160;")
+    
+    
+    private fun printMermaidTransition(transition: VisualTransition, output: PrintWriter, includeDetail: Boolean) {
+        val startName = when {
+            transition.type == DEFAULT -> transition.startMap
+            "<<start>>" == transition.start || "START" == transition.start -> "[*]"
+            else -> transition.start
+        } ?: "<<unknown>>"
+        val endName = when {
+            "<<end>>" == transition.target || "END" == transition.target -> "[*]"
+            else -> transition.target
+        } ?: transition.start ?: "<<unknown>>"
+        val event = if (transition.automatic) "<<automatic>>" else transition.event
+        output.print("  ${startName.mermaidEscape()} --> ${endName.mermaidEscape()}")
+        if (event != null) {
+            output.print(" : ${event.mermaidEscape()}")
+        }
+        if (transition.guard != null && includeDetail) {
+            val guard = transition.guard!!
+            
+            val guardExp = if (guard.startsWith("{")) {
+                guard.substring(1, guard.length - 1).trim()
+            } else {
+                guard.trim()
+            }
+            if (event == null) {
+                output.print(" :")
+            }
+            output.print(" [".mermaidEscape())
+            output.print(guardExp.mermaidEscape())
+            output.print("]".mermaidEscape())
+        }
+        
+        if (includeDetail && transition.action != null && transition.action?.trim() != "{}") {
+            val action = transition.action!!
+            if (event == null && transition.guard == null) {
+                output.print(" : ")
+            }
+            output.print("#160;#8594;#160;")
+            if (action.endsWith("  }")) {
+                output.print(action.substring(0, action.length - 3).mermaidEscape())
+                output.print("}".mermaidEscape())
+            } else {
+                output.print(action.mermaidEscape())
+            }
+        }
+        output.println()
+    }
+    
+    @JvmStatic
+    fun mermaidDiagram(statemachine: VisualStateMachineDefinion, includeDetail: Boolean = true): String {
+        val sw = StringWriter()
+        val output = PrintWriter(sw)
+        output.println("---")
+        output.println("title: ${statemachine.name}")
+        output.println("""config:
+  themeCSS: |
+    .edgeLabel p:has(br) { text-align: left; }""")
+        output.println("---")
+        output.println("stateDiagram-v2")
+        statemachine.stateMaps.filter { it.value.name == statemachine.name }.forEach { stateMap ->
+            output.println("state ${stateMap.value.name} {")
+            stateMap.value.transitions.filter { it.start == "<<start>>" || it.start == "START" }.forEach {
+                printMermaidTransition(it, output, includeDetail)
+            }
+            stateMap.value.transitions.filter { it.start != "<<start>>" && it.start != "START" }.forEach {
+                printMermaidTransition(it, output, includeDetail)
+            }
+        }
+        statemachine.stateMaps.filter { it.value.name != statemachine.name }.forEach { stateMap ->
+            output.print("  ")
+            output.println("state ${stateMap.value.name} {")
+            stateMap.value.transitions.filter { it.start == "<<start>>" || it.start == "START" }.forEach {
+                output.print("  ")
+                printMermaidTransition(it, output, includeDetail)
+            }
+            stateMap.value.transitions.filter { it.start != "<<start>>" && it.start != "START" }.forEach {
+                output.print("  ")
+                printMermaidTransition(it, output, includeDetail)
+            }
+            output.println("  }")
+        }
+        output.println("}")
+        if (includeDetail && statemachine.invariants.isNotEmpty()) {
+            output.println("note left of ${statemachine.name}")
+            statemachine.invariants.forEach {
+                output.println("<<invariant>> $it".mermaidEscape())
+            }
+            output.println("end note")
+        }
+        output.println()
+        output.flush()
+        sw.flush()
+        return sw.toString()
+    }
     private fun printPlantUmlTransition(transition: VisualTransition, output: PrintWriter, includeDetail: Boolean) {
         val startName = if (transition.type == DEFAULT) transition.startMap else
             if ("<<start>>" == transition.start || "START" == transition.start) "[*]" else transition.start
@@ -49,7 +156,7 @@ object Visualization {
             output.print(guardExp)
             output.print("]")
         }
-
+        
         if (includeDetail && transition.action != null && transition.action?.trim() != "{}") {
             val action = transition.action!!
                 .replace("\n", "\\l  ")
@@ -64,9 +171,9 @@ object Visualization {
         }
         output.println()
     }
-
+    
     @JvmStatic
-    public fun plantUml(statemachine: VisualStateMachineDefinion, includeDetail: Boolean = true): String {
+    fun plantUml(statemachine: VisualStateMachineDefinion, includeDetail: Boolean = true): String {
         val sw = StringWriter()
         val output = PrintWriter(sw)
         output.println("@startuml")

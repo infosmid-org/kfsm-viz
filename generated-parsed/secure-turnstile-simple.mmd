@@ -1,0 +1,17 @@
+---
+title: SecureTurnstileFSM
+config:
+  themeCSS: |
+    .edgeLabel p:has(br) { text-align: left; }
+---
+stateDiagram-v2
+state SecureTurnstileFSM {
+  [*] --> UNLOCKED
+  LOCKED --> LOCKED : CARD
+  LOCKED --> LOCKED : CARD
+  LOCKED --> UNLOCKED : CARD
+  LOCKED --> LOCKED : CARD
+  UNLOCKED --> LOCKED : CARD
+  UNLOCKED --> LOCKED : PASS
+}
+

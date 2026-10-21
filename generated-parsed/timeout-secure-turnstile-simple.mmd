@@ -1,0 +1,18 @@
+---
+title: TimerSecureTurnstileFSM
+config:
+  themeCSS: |
+    .edgeLabel p:has(br) { text-align: left; }
+---
+stateDiagram-v2
+state TimerSecureTurnstileFSM {
+  [*] --> UNLOCKED
+  LOCKED --> LOCKED : CARD
+  LOCKED --> LOCKED : CARD
+  LOCKED --> UNLOCKED : CARD
+  LOCKED --> LOCKED : CARD
+  UNLOCKED --> LOCKED : #60;#60;timeout#160;=#160;TimerSecureTurnstile#58;#58;timeout#62;#62;
+  UNLOCKED --> LOCKED : CARD
+  UNLOCKED --> LOCKED : PASS
+}
+

@@ -1,0 +1,17 @@
+---
+title: SecureTurnstileFSM
+config:
+  themeCSS: |
+    .edgeLabel p:has(br) { text-align: left; }
+---
+stateDiagram-v2
+state SecureTurnstileFSM {
+  [*] --> UNLOCKED
+  LOCKED --> LOCKED : CARD#160;[cardId#8594;<br/>requireNotNull(cardId)#35;59;<br/>isOverrideCard(cardId)#38;#38;overrideActive#35;59;]#160;#8594;#160;#123;<br/>cancelOverride()<br/>#125;
+  LOCKED --> LOCKED : CARD#160;[cardId#8594;<br/>requireNotNull(cardId)#35;59;<br/>isOverrideCard(cardId)#35;59;]#160;#8594;#160;#123;<br/>activateOverride()<br/>#125;
+  LOCKED --> UNLOCKED : CARD#160;[cardId#8594;<br/>requireNotNull(cardId)#35;59;<br/>overrideActive||isValidCard(cardId)#35;59;]#160;#8594;#160;#123;<br/>unlock()<br/>#125;
+  LOCKED --> LOCKED : CARD#160;[cardId#8594;<br/>requireNotNull(cardId)#123;"cardId#160;is#160;required"#125;#35;59;<br/>!isValidCard(cardId)#35;59;]#160;#8594;#160;#123;cardId#8594;<br/>requireNotNull(cardId)<br/>invalidCard(cardId)<br/>#125;
+  UNLOCKED --> LOCKED : CARD#160;[cardId#8594;<br/>requireNotNull(cardId)#35;59;<br/>isOverrideCard(cardId)#35;59;]#160;#8594;#160;#123;<br/>lock()<br/>#125;
+  UNLOCKED --> LOCKED : PASS#160;#8594;#160;#123;<br/>lock()<br/>#125;
+}
+

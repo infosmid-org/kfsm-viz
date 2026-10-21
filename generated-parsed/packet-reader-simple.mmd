@@ -1,0 +1,25 @@
+---
+title: PacketReaderFSM
+config:
+  themeCSS: |
+    .edgeLabel p:has(br) { text-align: left; }
+---
+stateDiagram-v2
+state PacketReaderFSM {
+  [*] --> RCVPCKT : CTRL
+  RCVPCKT --> RCVDATA : CTRL
+  RCVPCKT --> RCVCHK : BYTE
+  RCVDATA --> RCVDATA : BYTE
+  RCVDATA --> RCVPCKT : CTRL
+  RCVDATA --> RCVESC : ESC
+  RCVESC --> RCVDATA : ESC
+  RCVESC --> RCVDATA : CTRL
+  RCVCHK --> RCVCHK : BYTE
+  RCVCHK --> RCVCHKESC : ESC
+  RCVCHK --> CHKSUM : CTRL
+  CHKSUM --> [*] : #60;#60;automatic#62;#62;
+  CHKSUM --> [*] : #60;#60;automatic#62;#62;
+  RCVCHKESC --> RCVCHK : ESC
+  RCVCHKESC --> RCVCHK : CTRL
+}
+

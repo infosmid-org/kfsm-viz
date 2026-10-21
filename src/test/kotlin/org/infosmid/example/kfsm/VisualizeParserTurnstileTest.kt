@@ -16,6 +16,7 @@
 package org.infosmid.example.kfsm
 
 import org.infosmid.kfsm.viz.Visualization.plantUml
+import org.infosmid.kfsm.viz.Visualization.mermaidDiagram
 import org.infosmid.kfsm.viz.Parser.parseStateMachine
 import org.infosmid.kfsm.viz.Visualization.asciiDoc
 
@@ -40,7 +41,9 @@ class VisualizeParserTurnstileTest {
         val visualisation = parseStateMachine("SimpleTurnstileFSM", File("src/test/resources/SimpleTurnstile.kt"))
         println(visualisation)
         File("generated-parsed", "simple-turnstile.plantuml").writeText(plantUml(visualisation))
+        File("generated-parsed", "simple-turnstile.mmd").writeText(mermaidDiagram(visualisation))
         File("generated-parsed", "simple-turnstile-simple.plantuml").writeText(plantUml(visualisation, false))
+        File("generated-parsed", "simple-turnstile-simple.mmd").writeText(mermaidDiagram(visualisation, false))
         File("generated-parsed", "simple-turnstile.adoc").writeText(asciiDoc(visualisation))
     }
 
@@ -50,7 +53,9 @@ class VisualizeParserTurnstileTest {
         val visualisation = parseStateMachine("TurnstileFSM", File("src/test/resources/Turnstile.kt"))
         println(visualisation)
         File("generated-parsed", "turnstile.plantuml").writeText(plantUml(visualisation))
+        File("generated-parsed", "turnstile.mmd").writeText(mermaidDiagram(visualisation))
         File("generated-parsed", "turnstile-simple.plantuml").writeText(plantUml(visualisation, false))
+        File("generated-parsed", "turnstile-simple.mmd").writeText(mermaidDiagram(visualisation, false))
         File("generated-parsed", "turnstile.adoc").writeText(asciiDoc(visualisation))
     }
 
@@ -60,7 +65,9 @@ class VisualizeParserTurnstileTest {
         val visualisation = parseStateMachine("PayingTurnstileFSM", File("src/test/resources/PayingTurnstile.kt"))
         println(visualisation)
         File("generated-parsed", "paying-turnstile.plantuml").writeText(plantUml(visualisation))
+        File("generated-parsed", "paying-turnstile.mmd").writeText(mermaidDiagram(visualisation))
         File("generated-parsed", "paying-turnstile-simple.plantuml").writeText(plantUml(visualisation, false))
+        File("generated-parsed", "paying-turnstile-simple.mmd").writeText(mermaidDiagram(visualisation, false))
         File("generated-parsed", "paying-turnstile.adoc").writeText(asciiDoc(visualisation))
     }
 
@@ -70,7 +77,9 @@ class VisualizeParserTurnstileTest {
         val visualisation = parseStateMachine("SecureTurnstileFSM", File("src/test/resources/SecureTurnstile.kt"))
         println(visualisation)
         File("generated-parsed", "secure-turnstile.plantuml").writeText(plantUml(visualisation))
+        File("generated-parsed", "secure-turnstile.mmd").writeText(mermaidDiagram(visualisation))
         File("generated-parsed", "secure-turnstile-simple.plantuml").writeText(plantUml(visualisation, false))
+        File("generated-parsed", "secure-turnstile-simple.mmd").writeText(mermaidDiagram(visualisation, false))
         File("generated-parsed", "secure-turnstile.adoc").writeText(asciiDoc(visualisation))
     }
 
@@ -80,7 +89,9 @@ class VisualizeParserTurnstileTest {
         val visualisation = parseStateMachine("PacketReaderFSM", File("src/test/resources/PacketReader.kt"))
         println(visualisation)
         File("generated-parsed", "packet-reader.plantuml").writeText(plantUml(visualisation))
+        File("generated-parsed", "packet-reader.mmd").writeText(mermaidDiagram(visualisation))
         File("generated-parsed", "packet-reader-simple.plantuml").writeText(plantUml(visualisation, false))
+        File("generated-parsed", "packet-reader-simple.mmd").writeText(mermaidDiagram(visualisation, false))
         File("generated-parsed", "packet-reader.adoc").writeText(asciiDoc(visualisation))
     }
 
@@ -91,8 +102,10 @@ class VisualizeParserTurnstileTest {
             parseStateMachine("TimerSecureTurnstileFSM", File("src/test/resources/TimeoutSecureTurnstile.kt"))
         println(visualisation)
         File("generated-parsed", "timeout-secure-turnstile.plantuml").writeText(plantUml(visualisation))
+        File("generated-parsed", "timeout-secure-turnstile.mmd").writeText(mermaidDiagram(visualisation))
         File("generated-parsed", "timeout-secure-turnstile-simple.plantuml").writeText(plantUml(visualisation, false))
+        File("generated-parsed", "timeout-secure-turnstile-simple.mmd").writeText(mermaidDiagram(visualisation, false))
         File("generated-parsed", "timeout-secure-turnstile.adoc").writeText(asciiDoc(visualisation))
     }
-
+    
 }
