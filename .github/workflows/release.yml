@@ -46,3 +46,7 @@ jobs:
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_PRIVATE_KEY }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.GPG_PASSPHRASE }}
+      - uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          generateReleaseNotes: true
