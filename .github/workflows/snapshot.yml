@@ -1,14 +1,12 @@
-# Publishes SNAPSHOT versions to GitHub Packages.
-# This workflow runs for each push to main. It uses the GITHUB_TOKEN. It does not use other secrets.
-name: Publish snapshot
+name: snapshot
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   workflow_dispatch:
 
 concurrency:
-  group: publish-snapshot
+  group: snapshot
   cancel-in-progress: true
 
 jobs:

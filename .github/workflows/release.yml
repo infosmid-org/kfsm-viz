@@ -1,12 +1,8 @@
-# Publishes milestones, release candidates and releases to Maven Central.
-# Push a tag such as v1.0.0, v1.1.0-M1 or v1.1.0-RC1 to start this workflow.
-# The version comes from the tag. The leading "v" is removed.
-# Maven Central does not let you delete or replace a published version.
 name: Release to Maven Central
 
 on:
   push:
-    tags: ['v*']
+    tags: [ 'v*' ]
 
 concurrency:
   group: release-${{ github.ref_name }}
