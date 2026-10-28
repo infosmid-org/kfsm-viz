@@ -9,9 +9,11 @@ skinparam state {
 state SecureTurnstileFSM {
 [*] --> UNLOCKED
 LOCKED --> LOCKED : CARD [cardId->\l  requireNotNull(cardId);\l  isOverrideCard(cardId)&&overrideActive;\l] -> {\l  cancelOverride()\l}
-LOCKED --> LOCKED : CARD [cardId->\l  requireNotNull(cardId);\l  isOverrideCard(cardId);\l] -> {\l  activateOverride()\l}
+LOCKED --> OVERRIDE : CARD [cardId->\l  requireNotNull(cardId);\l  isOverrideCard(cardId);\l] -> {\l  activateOverride()\l}
 LOCKED --> UNLOCKED : CARD [cardId->\l  requireNotNull(cardId);\l  overrideActive||isValidCard(cardId);\l] -> {\l  unlock()\l}
 LOCKED --> LOCKED : CARD [cardId->\l  requireNotNull(cardId){"cardId is required"};\l  !isValidCard(cardId);\l] -> {cardId->\l  requireNotNull(cardId)\l  invalidCard(cardId)\l}
+OVERRIDE --> UNLOCKED : CARD [cardId->\l  requireNotNull(cardId){"cardId is required"};\l  !isValidCard(cardId);\l] -> {cardId->\l  println("Allowing invalid card:$cardId")\l  cancelOverride()\l  unlock()\l}
+OVERRIDE --> UNLOCKED : CARD [cardId->\l  requireNotNull(cardId){"cardId is required"};\l  isValidCard(cardId);\l] -> {cardId->\l  println("Allowing valid card:$cardId")\l  cancelOverride()\l  unlock()\l}
 UNLOCKED --> LOCKED : CARD [cardId->\l  requireNotNull(cardId);\l  isOverrideCard(cardId);\l] -> {\l  lock()\l}
 UNLOCKED --> LOCKED : PASS -> {\l  lock()\l}
 }

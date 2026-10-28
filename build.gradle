@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.dokka)
     alias(libs.plugins.maven.publish)
+    alias(libs.plugins.asciidoctor)
 }
 
 group = 'org.infosmid'
@@ -118,3 +119,68 @@ mavenPublishing {
         }
     }
 }
+
+// User guide built from README.adoc via src/docs/asciidoc/index.adoc
+asciidoc {
+    publications {
+        main {
+            sourceSet {
+                sourceDir = 'src/docs/asciidoc'
+                sources {
+                    include 'index.adoc'
+                }
+                resources {
+                    include '**/*.png'
+                    include '**/*.svg'
+                }
+                attributes {
+                    addAll 'toc': 'left',
+                        'idprefix': '',
+                        'idseparator': '-',
+                        // Lets index.adoc link to the API docs: link:{api-docs}/index.html[API]
+                        'api-docs': 'api'
+                }
+                missingIncludesAreFatal()
+            }
+            output 'asciidoctorj', 'html'
+        }
+    }
+}
+
+// README.adoc references the root *.svg files; the guide needs them next to index.html
+tasks.named('asciidoctorHtml') {
+    doLast {
+        copy {
+            from(projectDir) { include '*.svg' }
+            into outputDir
+        }
+    }
+}
+
+// The docs zip has its own publication (kfsm-viz-doc) so it is only published to GitHub Packages.
+publishing {
+    publications {
+        documentation(MavenPublication) {
+            artifactId = "${rootProject.name}-doc"
+        }
+    }
+}
+tasks.withType(PublishToMavenRepository).configureEach {
+    if (publication.name == 'documentation') {
+        onlyIf { repository.name == 'GitHubPackages' }
+    }
+}
+
+// Properties read by gradle/site-docs.gradle (siteDocsZip); must be set before it is applied.
+ext {
+    siteDocsTitle       = projectName
+    siteDocsSummary     = projectDescription
+    siteDocsGuideTask   = 'asciidoctorHtml'
+    siteDocsApiTask     = 'dokkaGeneratePublicationHtml'
+    siteDocsPublication = 'documentation'
+    siteDocsArtifactId  = rootProject.name
+    siteDocsTags        = ['Kotlin', 'FSM', 'PlantUML', 'Asciidoc', 'Mermaid']
+    siteDocsLicense     = 'Apache-2.0'
+    siteDocsSourceUrl   = "https://github.com/infosmid-org/${rootProject.name}".toString()
+}
+apply from: "$rootProject.projectDir/gradle/site-docs.gradle"

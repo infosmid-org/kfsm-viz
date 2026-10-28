@@ -5,13 +5,13 @@
 |===
 | Start | Event[Guard] | Target | Action
 
-| <<start>>
+| \<<start>>
 | 
 | UNLOCKED
 a| 
 
 | LOCKED
-| CARD `[{cardId->requireNotNull(cardId);isOverrideCard(cardId)&&overrideActive;}]`
+| CARD `[{cardId-> requireNotNull(cardId); isOverrideCard(cardId)&&overrideActive; }]`
 | LOCKED
 a| [source,kotlin]
 ----
@@ -21,7 +21,7 @@ cancelOverride()
 ----
 
 | LOCKED
-| CARD `[{cardId->requireNotNull(cardId);isOverrideCard(cardId);}]`
+| CARD `[{cardId-> requireNotNull(cardId); isOverrideCard(cardId); }]`
 | LOCKED
 a| [source,kotlin]
 ----
@@ -31,7 +31,7 @@ activateOverride()
 ----
 
 | LOCKED
-| CARD `[{cardId->requireNotNull(cardId);overrideActive\|\|isValidCard(cardId);}]`
+| CARD `[{cardId-> requireNotNull(cardId); overrideActive\|\|isValidCard(cardId); }]`
 | UNLOCKED
 a| [source,kotlin]
 ----
@@ -41,7 +41,7 @@ unlock()
 ----
 
 | LOCKED
-| CARD `[{cardId->requireNotNull(cardId){"cardId is required"};!isValidCard(cardId);}]`
+| CARD `[{cardId-> requireNotNull(cardId){"cardId is required"}; !isValidCard(cardId); }]`
 | LOCKED
 a| [source,kotlin]
 ----
@@ -63,7 +63,7 @@ lock()
 ----
 
 | UNLOCKED
-| CARD `[{cardId->requireNotNull(cardId);isOverrideCard(cardId);}]`
+| CARD `[{cardId-> requireNotNull(cardId); isOverrideCard(cardId); }]`
 | LOCKED
 a| [source,kotlin]
 ----

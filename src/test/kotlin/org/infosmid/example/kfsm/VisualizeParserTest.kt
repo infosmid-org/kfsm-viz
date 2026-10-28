@@ -24,7 +24,7 @@ import org.junit.Before
 import org.junit.Test
 import java.io.File
 
-class VisualizeParserTurnstileTest {
+class VisualizeParserTest {
     @Before
     fun setup() {
         val generated = File("generated-parsed")
@@ -107,5 +107,5 @@ class VisualizeParserTurnstileTest {
         File("generated-parsed", "timeout-secure-turnstile-simple.mmd").writeText(mermaidDiagram(visualisation, false))
         File("generated-parsed", "timeout-secure-turnstile.adoc").writeText(asciiDoc(visualisation))
     }
-    
+
 }

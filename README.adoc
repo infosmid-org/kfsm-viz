@@ -1,4 +1,9 @@
 = KFSM Visualization
+:project-version: 2.0.1
+
+image:https://github.com/infosmid-org/kfsm-viz/actions/workflows/snapshot.yml/badge.svg[Build Status,link=https://github.com/infosmid-org/kfsm-viz/actions/workflows/snapshot.yml]
+image:https://img.shields.io/maven-central/v/org.infosmid/kfsm-viz.svg[Maven Central,link=https://central.sonatype.com/artifact/org.infosmid/kfsm-viz]
+image:https://img.shields.io/badge/License-Apache%202.0-blue.svg[License,link=LICENSE]
 
 This work is licensed under link:https://www.apache.org/licenses/LICENSE-2.0.html[Apache License 2.0]
 
@@ -10,18 +15,65 @@ No external grammar tools need to be built or installed. Run `./download-kotlin-
 
 == Getting Started
 
-[source,groovy]
+The library is only needed to generate documentation and diagrams from your tests, so add it using the `testImplementation` configuration and not `implementation`.
+This keeps it off your production classpath.
+
+=== Gradle Groovy DSL
+
+[source,groovy,subs="attributes+"]
 -----
 repositories {
-    maven {
-        url 'https://oss.sonatype.org/content/groups/public/'
-    }
     mavenCentral()
 }
 dependencies {
-    testImplementation 'org.infosmid:kfsm-viz:2.0.0'
+    testImplementation 'org.infosmid:kfsm-viz:{project-version}'
 }
 -----
+
+=== Gradle Kotlin DSL
+
+[source,kotlin,subs="attributes+"]
+-----
+repositories {
+    mavenCentral()
+}
+dependencies {
+    testImplementation("org.infosmid:kfsm-viz:{project-version}")
+}
+-----
+
+=== Gradle Version Catalog
+
+Declare the library in `gradle/libs.versions.toml`:
+
+[source,toml,subs="attributes+"]
+-----
+[versions]
+kfsm-viz = "{project-version}"
+
+[libraries]
+kfsm-viz = { module = "org.infosmid:kfsm-viz", version.ref = "kfsm-viz" }
+-----
+
+Then reference it from `build.gradle` (Groovy DSL):
+
+[source,groovy]
+-----
+dependencies {
+    testImplementation libs.kfsm.viz
+}
+-----
+
+or from `build.gradle.kts` (Kotlin DSL):
+
+[source,kotlin]
+-----
+dependencies {
+    testImplementation(libs.kfsm.viz)
+}
+-----
+
+=== Generating the artifacts
 
 You can implement a test method to generate the required statemachine model artifacts, or you can configure the link:https://github.com/infosmid-org/kfsm-viz-plugin[kfsm-viz-plugin] for Gradle to produce visualizations.
 
@@ -39,9 +91,10 @@ fun produceVisualizationTurnstileFSM() {
     println("== TurnStile")
     val visualisation = parseStateMachine("TurnstileFSM", File("src/test/kotlin/Turnstile.kt"))
 
-    File("generated-parsed", "turnstile.plantuml").writeText(plantUml(visualisation, true)) <1>
-
-    File("generated-parsed", "turnstile-simple.plantuml").writeText(plantUml(visualisation, false)) <2>
+    val plantUmlFile = File("generated-parsed", "turnstile.plantuml")
+	plantUmlFile.writeText(plantUml(visualisation, true)) // <1>
+    val plantUmlSimpleFile = File("generated-parsed", "turnstile-simple.plantuml")
+	plantUmlSimpleFile.writeText(plantUml(visualisation, false)) // <2>
 }
 ----
 
@@ -64,59 +117,89 @@ fun produceVisualizationTurnstileFSM() {
 
 We generated an asciidoc table as well as a plantuml statemachine model.
 
-==== Simple Turnstile FSM
+=== Simple Turnstile FSM
 
 link:./src/test/resources/SimpleTurnstile.kt[SimpleTurnstile.kt]
 
-===== Simple State Diagram
+==== Simple State Diagrams
 
-image::simple-turnstile-simple.svg[]
+===== PlantUML
 
-===== Detailed State Diagram
+image::simple-turnstile-simple.svg[width=40%]
 
-image::simple-turnstile.svg[]
+===== Mermaid
+
+image::simple-turnstile-simple-mmd.svg[width=40%]
+
+
+==== Detailed State Diagrams
+===== PlantUML
+image::simple-turnstile.svg[width=50%]
+
+===== Mermaid
+image::simple-turnstile-mmd.svg[width=50%]
 
 include::generated-parsed/simple-turnstile.adoc[]
 
-==== Paying Turnstile FSM
+=== Paying Turnstile FSM
 
 link:./src/test/resources/PayingTurnstile.kt[PayingTurnstile.kt]
 
-===== Simple State Diagram
+==== Simple State Diagram
 
-image::paying-turnstile-simple.svg[]
+===== PlantUML
+image::paying-turnstile-simple.svg[width=60%]
 
-===== Detailed State Diagram
+===== Mermaid
+image::paying-turnstile-simple-mmd.svg[width=60%]
 
-image::paying-turnstile.svg[]
+==== Detailed State Diagram
+===== PlantUML
+image::paying-turnstile.svg[width=90%]
+
+===== Mermaid
+image::paying-turnstile-mmd.svg[width=90%]
 
 include::generated-parsed/paying-turnstile.adoc[]
 
-==== Secure Turnstile FSM
+=== Secure Turnstile FSM
 
 link:./src/test/resources/SecureTurnstile.kt[SecureTurnstile.kt]
 
-===== Simple State Diagram
+==== Simple State Diagram
 
-image::secure-turnstile-simple.svg[]
+===== PlantUML
+image::secure-turnstile-simple.svg[width=50%]
 
-===== Detailed State Diagram
+===== Mermaid
+image::secure-turnstile-simple-mmd.svg[width=50%]
 
-image::secure-turnstile.svg[]
+==== Detailed State Diagram
+===== PlantUML
+image::secure-turnstile.svg[width=90%]
+===== Mermaid
+image::secure-turnstile-mmd.svg[width=90%]
 
 include::generated-parsed/secure-turnstile.adoc[]
 
-==== Packer Reader FSM
+=== Packer Reader FSM
 
 link:./src/test/resources/PacketReader.kt[PacketReader.kt]
 
-===== Simple State Diagram
+==== Simple State Diagram
+===== PlantUML
+image::packet-reader-simple.svg[width=60%]
+===== Mermaid
+image::packet-reader-simple-mmd.svg[width=60%]
+==== Detailed State Diagram
 
-image::packet-reader-simple.svg[]
+===== PlantUML
 
-===== Detailed State Diagram
+image::packet-reader.svg[width=90%]
 
-image::packet-reader.svg[]
+===== Mermaid
+
+image::packet-reader-mmd.svg[width=90%]
 
 include::generated-parsed/packet-reader.adoc[]
 

@@ -32,14 +32,13 @@ object Visualization {
         .replace(Regex("""\s+->\s+"""), "#160;#8594;#160;")
         .replace("->", "#8594;")
         .replace(":", "#58;")
-//        .replace("[", "#91;").replace("]", "#93;")
         .replace("{", "#123;").replace("}", "#125;")
         .replace("<", "#60;").replace(">", "#62;")
         .replace("&", "#38;")
         .replace("\r\n", "\n").replace("\n", "<br/>")
         .replace(" ", "#160;")
-    
-    
+
+
     private fun printMermaidTransition(transition: VisualTransition, output: PrintWriter, includeDetail: Boolean) {
         val startName = when {
             transition.type == DEFAULT -> transition.startMap
@@ -57,7 +56,7 @@ object Visualization {
         }
         if (transition.guard != null && includeDetail) {
             val guard = transition.guard!!
-            
+
             val guardExp = if (guard.startsWith("{")) {
                 guard.substring(1, guard.length - 1).trim()
             } else {
@@ -70,7 +69,7 @@ object Visualization {
             output.print(guardExp.mermaidEscape())
             output.print("]".mermaidEscape())
         }
-        
+
         if (includeDetail && transition.action != null && transition.action?.trim() != "{}") {
             val action = transition.action!!
             if (event == null && transition.guard == null) {
@@ -86,7 +85,7 @@ object Visualization {
         }
         output.println()
     }
-    
+
     @JvmStatic
     fun mermaidDiagram(statemachine: VisualStateMachineDefinion, includeDetail: Boolean = true): String {
         val sw = StringWriter()
@@ -156,7 +155,7 @@ object Visualization {
             output.print(guardExp)
             output.print("]")
         }
-        
+
         if (includeDetail && transition.action != null && transition.action?.trim() != "{}") {
             val action = transition.action!!
                 .replace("\n", "\\l  ")
@@ -171,7 +170,7 @@ object Visualization {
         }
         output.println()
     }
-    
+
     @JvmStatic
     fun plantUml(statemachine: VisualStateMachineDefinion, includeDetail: Boolean = true): String {
         val sw = StringWriter()
@@ -278,22 +277,29 @@ object Visualization {
 
     fun printAsciiDocTransition(transition: VisualTransition, output: PrintWriter) {
         output.println()
-        val startName = if (transition.type == DEFAULT) transition.startMap else
-            if ("\\<<start>>" == transition.start) "[*]" else transition.start
-                ?: "\\<<unknown>>"
-        val endName = if ("\\<<end>>" == transition.target || "END" == transition.target) "[*]" else transition.target
-            ?: transition.start ?: "\\<<unkown>>"
-        val event =
-            if (transition.automatic) "\\<<automatic>>" else transition.event?.replace("<<", "\\<<") ?: ""
-        output.println("| $startName")
-        output.print("| $event")
+        val startName = when {
+			transition.type == DEFAULT -> transition.startMap
+			"<<start>>" == transition.start || "START" == transition.start -> "<<start>>"
+			else -> transition.start
+		} ?: "<<unknown>>"
+        val endName = when {
+			"<<end>>" == transition.target || "END" == transition.target -> "<<end>>"
+			else -> transition.target
+		} ?: transition.start ?: "<<unknown>>"
+		val endText = endName.replace("<<", "\\<<")
+        val event = if (transition.automatic) "<<automatic>>" else transition.event ?: ""
+		val eventName = startName.replace("<<", "\\<<")
+		val eventText = event.replace("<<", "\\<<")
+        output.println("| $eventName")
+        output.print("| $eventText")
 
         if (transition.guard != null) {
-            val guard = transition.guard?.replace("\n", "")?.replace("\r", "")
+            val guard = transition.guard?.replace("\n", " ")
+				?.replace("\r", "")
             output.print(escapeCharacters(" `[$guard]`", "|"))
         }
         output.println()
-        output.println("| $endName")
+        output.println("| $endText")
         output.print("a| ")
         if (transition.action != null && transition.action?.trim() != "{}") {
             val action = transition.action?.replace("\r", "")

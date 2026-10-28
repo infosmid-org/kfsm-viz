@@ -1,4 +1,5 @@
 [versions]
+asciidoctor-plugin = "5.0.3"
 kotlin = "2.2.21"
 dokka = "2.2.0"
 antlr = "4.13.2"
@@ -17,3 +18,4 @@ kfsm-jvm = { module = "io.jumpco.open:kfsm-jvm", version.ref = "kfsm" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish-plugin" }
+asciidoctor = { id = "org.asciidoctor.jvm", version.ref = "asciidoctor-plugin" }

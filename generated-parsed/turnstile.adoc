@@ -5,7 +5,7 @@
 |===
 | Start | Event[Guard] | Target | Action
 
-| <<start>>
+| \<<start>>
 | 
 | UNLOCKED
 a| 
